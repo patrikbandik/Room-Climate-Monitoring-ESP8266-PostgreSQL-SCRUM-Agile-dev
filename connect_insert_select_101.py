@@ -29,4 +29,3 @@ con.commit()
 cur.close()
 #close the connection
 con.close()
-y
