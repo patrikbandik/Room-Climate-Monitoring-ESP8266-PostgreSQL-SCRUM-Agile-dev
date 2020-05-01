@@ -26,7 +26,7 @@ while True:
         if ("baaa/first_f/108.2/temp" in msg.topic):
             global temp
             temp = float(msg.payload)
-            print("Temp done")
+            print("Temp done: ", temp)
             global done1
             done1 = 1
 
@@ -41,15 +41,16 @@ while True:
             timestamp = datetime.datetime.today()
             print(timestamp)
             hum = float(msg.payload)
-            print("Hum done")
+            print("Hum done:", hum)
             global done2
-            done2 = 1
+            #done2 = 1
 
         if ("baaa/first_f/108.2/light" in msg.topic):
             global light
-            light = int(msg.payload)
+            light = float(msg.payload)
             first_time = time.perf_counter()
-            print(first_time)
+            #print(first_time)
+            print("Light done:", light)
             global done3
             # done3 = 1
             if light == 0:
@@ -62,18 +63,31 @@ while True:
                 else:
                     print("Goal not met. ")
 
+        if ("baaa/first_f/108.2/gps_x" in msg.topic):
+            global gps_x_value
+            gps_x_value = float(msg.payload)
+            print("GPS X done:", gps_x_value)
+
+        if ("baaa/first_f/108.2/gps_y" in msg.topic):
+            global gps_y_value
+            gps_y_value = float(msg.payload)
+            print("GPS Y done: ", gps_y_value)
+            done2 = 1
+
+
         # inserting all the information to the database
         if done1 + done2 == 2:
             print("Print z mqtt.")
             done1 = 0
             done2 = 0
-            postgres_insert_query = """ INSERT INTO baaa (room_id,floor_id,temperature, humidity,time_stamp) VALUES (%s,%s,%s,%s,%s)"""
-            record_to_insert = (room_num, floor_num, temp, hum, timestamp)
+            postgres_insert_query = """ INSERT INTO baaa (room_id,floor_id,temperature, humidity,light,gps_x,gps_y,time_stamp) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
+            record_to_insert = (room_num, floor_num, temp, hum, light,gps_x_value,gps_y_value,timestamp)
             cur.execute(postgres_insert_query, record_to_insert)
             print("Done")
 
             connection.commit()
             print("Commited")
+            delay(3)
             # cur.close()
             # connection.close()
             # os.execl(sys.executable, os.path.abspath('python "C:/Users/roman/PycharmProjects/project3/mqtt_to_database.py"'), *sys.argv)
