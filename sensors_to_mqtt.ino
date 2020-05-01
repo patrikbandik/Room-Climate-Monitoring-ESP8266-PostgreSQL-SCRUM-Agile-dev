@@ -1,6 +1,5 @@
-#include <ESP8266WiFi.h>
-#include <PubSubClient.h>
-#include <DHT.h>
+#include <TinyGPS++.h>
+#include <SoftwareSerial.h>
 int sensor = A0;
 int sensorvalues = 0;
 // Update these with values suitable for your network.
@@ -24,6 +23,13 @@ char msg3 [80];
 char msg4 [80];
 char msg5 [80];
 char msg6 [80];
+char msg7 [80];
+char msg8 [80];
+char msg9 [80];
+
+static const uint32_t GPSBaud = 9600;
+TinyGPSPlus gps;
+SoftwareSerial ss(4, 5);
 
 void setup_wifi() {
 
@@ -99,6 +105,10 @@ void setup() {
   setup_wifi();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
+  
+  ss.begin(GPSBaud);
+  
+  pinMode(14,OUTPUT);
 }
 
 void loop() {
@@ -112,38 +122,135 @@ void loop() {
   if (now - lastMsg > 2000) {
     lastMsg = now;
      sensorvalues = analogRead(sensor);
-    Serial.print("The voltage is: ");
-    Serial.println(sensorvalues);
+   // Serial.print("The voltage is: ");
+   // Serial.println(sensorvalues);
+    
     float voltage = sensorvalues * (3.3/1023);
-    Serial.print("The voltage: ");
-    Serial.println(voltage);
+   // Serial.print("The voltage: ");
+   // Serial.println(voltage);
+    
     float temp = (voltage*1000 -500)/10;
-    Serial.print("Temperature is: ");
-    Serial.println(temp);
+   // Serial.print("Temperature is: ");
+   // Serial.println(temp);
     delay(2000);
     snprintf (msg, 50,"%.2f",temp);  
     
     float hum;
     float temperature;
-    Serial.println(msg);
+    float light;
+    float gps_x;
+    float gps_y;
+   // Serial.println(msg);
 
    // snprintf (msg2, 50, "%.2f",high); 
     //snprintf (msg3 , 50, "%.2f", low);
     //snprintf (msg4,50, "%.2f", normal);
+
+    
     hum = dht.readHumidity();
     temperature = dht.readTemperature();
-   
+    light = analogRead(A0);
+    gps_x = 47.767958;
+    gps_y = 18.095432;
+    
+    // 47.767958,18.095432
+    
+  /// while (ss.available() > 0)
+    // if (gps.encode(ss.read())){
+      //Serial.print(F("Location: "));
+     // if (gps.location.isValid())
+      //{
+      //  Serial.print("Latitued: ");
+      //  Serial.println(gps.location.lat(), 6);
+       // Serial.print("Longtitude: ");
+       // Serial.println(gps.location.lng(), 6);
+      //}
+     // else
+     // {
+       // Serial.print(F("INVALID"));
+     //}
+       // Serial.println();
+    // }
+        
+    //if (millis() > 5000 && gps.charsProcessed() < 10)
+    //{
+     // Serial.println(F("No GPS detected: check wiring."));
+     // while(true);
+    //}
+
+    snprintf (msg8 , 50, "%.6f",gps_x);
+    Serial.print("Latitude(x): ");
+    Serial.println(gps_x , 6);
+
+    snprintf (msg9 , 50, "%.6f",gps_y);
+    Serial.print("Latitude(y): ");
+    Serial.println(gps_y , 6);
    
     snprintf (msg5 , 50, "%.2f", hum);
     Serial.print("Humidity is:");
     Serial.println(hum);
+    
     snprintf (msg6,50, "%.2f", temperature);
     Serial.print("Temperature is:");
     Serial.println(temperature);
+    
     //client.publish("Romes/temperature", msg);
     //client.publish("Romes/humidity",msg5);
+
+    snprintf(msg7,50,"%.2f",light);
+    Serial.print("Light is:");
+    Serial.println(light);
+
+    if (light<256){
+    Serial.println("Low visibility");
+    analogWrite(14,0);
+    }
+    if (light> 256 and light<512){
+    Serial.println("Bad visibility");
+    analogWrite(14,40);
+    }
+     if (light>512 and light<768){
+    Serial.print("Good visibility");
+    analogWrite(14,200);
+    }
+    if (light>768){
+     Serial.println("Max visibility");
+    analogWrite(14,255);
+    }
+    
+    client.publish("baaa/first_f/108.2/gps_x",msg8);
+    client.publish("baaa/first_f/108.2/gps_y",msg9);
     client.publish("baaa/first_f/108.2/temp",msg6);
+    client.publish("baaa/first_f/108.2/light",msg7);
     client.publish("baaa/first_f/108.2/hum",msg5);
-    Serial.print("Sleep");
+    //Serial.print("Sleep");
+    Serial.println("-----------------------------");
     delay(3000); //300000 for 5 min sleep 
     
+   /* if (temp >= 10 and temp <= 30){
+    client.publish("Romes/temperature/attention", msg4);
+    }
+    if (temp > 30){
+    client.publish("Romes/temperature/attention", msg2);
+    }
+    if (temp < 10) {
+    client.publish("Romes/temperature/attention", msg3);
+    }
+    */
+}
+}
+
+void displayInfo()
+{
+  Serial.print(F("Location: ")); 
+  if (gps.location.isValid())
+  {
+    Serial.println(gps.location.lat(), 6);
+    Serial.println(gps.location.lng(), 6);
+  }
+  else
+  {
+    Serial.print(F("INVALID"));
+  }
+  Serial.println();
+}
