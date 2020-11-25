@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>BAAA Main Hall</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/try.css') }}">
+		<style>
+			h3.perfect {
+				color:#229954;
+				font-weight: bold;
+			}
+			h3.good {
+				color:#D4AC0D;
+				font-weight: bold;
+			}
+			h3.bad {
+				color:#E74C3C;
+				font-weight: bold;
+			}
+			h3.dark {
+				color:#A93226;
+				font-weight: bold;
+			}
+			h3.cold {
+				color:#3498DB;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+        <header id="header">
+            <a class="logo" href="/">HOME</a>
+            <a class="logo" href="all_rooms">ALL ROOMS</a>
+            <a class="logo" href="contact">CONTACT</a>
+			<a class="logo" href="logout">LOG OUT</a>
+        </header>
+
+		<!-- Heading -->
+			<div id="heading" >
+				<h1>Main Hall</h1>
+			</div>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<header class="special">
+				<div class="inner">
+					<div class="content">
+						<h2 class="icon fa-building"><span class="label">Icon</span> Floor & Room:</h2>
+                        {% for mydata in myHall %}
+								<h3>{{ mydata.floor_id }} & {{ mydata.room_id }}</h3>
+                        <h2 class="icon fa-clock-o"><span class="label">Icon</span> Last Measurement Made:</h2>
+								<h3>{{ mydata.date_stamp }} {{ mydata.time_stamp }}</h3>
+                        <h2 class="icon fa-thermometer-half"><span class="label">Icon</span> Temperature:</h2>
+								 {% for mydata in myHall %}
+                                {% if 30>= mydata.temperature|int >= 24 %}
+									<h3 class="bad">{{ mydata.temperature }}°C hot</h3>
+								{% elif 23.9>= mydata.temperature|int >= 20 %}
+									<h3 class="perfect">{{ mydata.temperature }}°C perfect</h3>
+								{% elif 19.9>= mydata.temperature|int >= 18 %}
+									<h3 class="good">{{ mydata.temperature }}°C good</h3>
+								{% elif 17.9>= mydata.temperature|int >= 14 %}
+									<h3 class="cold">{{ mydata.temperature }}°C cold</h3>
+								{% else %}
+									<h3 class="dark">{{ mydata.temperature }}°C bad</h3>
+								{% endif %}
+                            {%  endfor %}
+                        <h2 class="icon fa-tint"><span class="label">Icon</span> Humidity:</h2>
+								<h3>{{ mydata.humidity }}%</h3>
+                        <h2 class="icon fa-lightbulb-o"><span class="label">Icon</span> Light Level:</h2>
+                                {% if 1024>= mydata.light|int >= 768 %}
+									<h3 class="perfect">{{ mydata.light }} perfect</h3>
+								{% elif 767.9>= mydata.light|int >= 512 %}
+									<h3 class="good">{{ mydata.light }} good</h3>
+								{% elif 511.9>= mydata.light|int >= 256 %}
+									<h3 class="bad">{{ mydata.light }} bad</h3>
+								{% else %}
+									<h3 class="dark">{{ mydata.light }} dark</h3>
+								{% endif %}
+                            {%  endfor %}
+                        <h2 class="icon fa-map-marker"><span class="label">Icon</span> GPS Location:</h2>
+                        {% for mydata in myHall %}
+								<h3>{{ mydata.gpsx }} / {{ mydata.gpsy }}</h3>
+						{%  endfor %}
+                        <br>
+                        <header class="special">
+							<hr />
+							<h3><a href="showdata">History of Measurements</a></h3>
+							<h3><a href="map">MAP</a></h3>
+							<h3><a href="chart">Temperature Graph</a></h3>
+                            <hr />
+                        </header>
+					</div>
+				</div>
+            </section>
+
+		<!-- Scripts -->
+			<script src="static/js/jquery.min.js"></script>
+			<script src="static/js/browser.min.js"></script>
+			<script src="static/js/breakpoints.min.js"></script>
+			<script src="static/js/util.js"></script>
+			<script src="static/js/main.js"></script>
+	</body>
+</html>

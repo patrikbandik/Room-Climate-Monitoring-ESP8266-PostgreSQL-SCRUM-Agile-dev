@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>BAAA Archive</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/try.css') }}">
+		<style>
+			td.perfect {
+				color:#229954;
+				font-weight: bold;
+			}
+			td.good {
+				color:#D4AC0D;
+				font-weight: bold;
+			}
+			td.bad {
+				color:#E74C3C;
+				font-weight: bold;
+			}
+			td.dark {
+				color:#A93226;
+				font-weight: bold;
+			}
+			td.cold {
+				color:#3498DB;
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body class="is-preload">
+
+      <!-- Header -->
+			<header id="header">
+				<a class="logo" href="/">HOME</a>
+				<a class="logo" href="all_rooms">ALL ROOMS</a>
+				<a class="logo" href="contact">CONTACT</a>
+				<a class="logo" href="logout">LOG OUT</a>
+			</header>
+
+		<!-- Heading -->
+			<div id="heading" >
+				<h1>Archive in Main Hall</h1>
+			</div>
+
+		<!-- Main -->
+			<section id="main" class="wrapper">
+				<div class="inner">
+					<div class="content">
+						<header class="special">
+							<h2>History</h2>
+							<br>
+						{% block title %}{% endblock %}
+						{% block content %}
+						<form action="#" method="post">
+							<p>Insert date (yyyy-mm-dd):</p>
+							<p><input type="text" name="nm" /></p>
+							<p><input type="submit" value="find date"/></p>
+						</form>
+							</header>
+						{% endblock %}
+						<header class="special">
+							<h2>{{ title }}</h2>
+							<h2>{{ user }}</h2>
+							</header>
+						<table>
+                            <tr>
+								<th>Date (yyyy-mm-dd)</th>
+                              <th>Time</th>
+                              <th>Temperature</th>
+                              <th>Humidity</th>
+                              <th>Light</th>
+                            </tr>
+                            <tr>
+                              {% for mydata in myHall %}
+                             <tr>
+								<td>{{ mydata.date_stamp }}</td>
+								<td>{{ mydata.time_stamp }}</td>
+								{% if 30>= mydata.temperature|int >= 24 %}
+                                	<td class="bad">{{ mydata.temperature }}°C hot</td>
+								{% elif 23.9>= mydata.temperature|int >= 20 %}
+									<td class="perfect">{{ mydata.temperature }}°C perfect</td>
+								{% elif 19.9>= mydata.temperature|int >= 18 %}
+									<td class="good">{{ mydata.temperature }}°C good</td>
+								{% elif 17.9>= mydata.temperature|int >= 14 %}
+									<td class="cold">{{ mydata.temperature }}°C cold</td>
+								{% else %}
+									<td class="dark">{{ mydata.temperature }}°C bad</td>
+								{% endif %}
+                                <td>{{ mydata.humidity }}%</td>
+                                {% if 1024>= mydata.light|int >= 768 %}
+									<td class="perfect">perfect</td>
+								{% elif 767.9>= mydata.light|int >= 512 %}
+									<td class="good">good</td>
+								{% elif 511.9>= mydata.light|int >= 256 %}
+									<td class="bad">bad</td>
+								{% else %}
+									<td class="dark">dark</td>
+								{% endif %}
+                            {%  endfor %}
+                            </tr>
+
+                          </table>
+                          <br><br>
+                          <header class="special">
+                            <h3><a href="main_hall">Back to Main Hall</a></h3>
+                            <hr />
+                        </header>
+					</div>
+				</div>
+			</section>
+
+		<!-- Scripts -->
+			<script src="static/js/jquery.min.js"></script>
+			<script src="static/js/browser.min.js"></script>
+			<script src="static/js/breakpoints.min.js"></script>
+			<script src="static/js/util.js"></script>
+			<script src="static/js/main.js"></script>
+
+	</body>
+</html>

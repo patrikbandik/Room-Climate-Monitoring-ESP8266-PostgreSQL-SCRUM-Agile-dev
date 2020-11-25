@@ -1,0 +1,39 @@
+<html>
+<head>
+		<title>BAAA Map</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/try.css') }}">
+	</head>
+<body>
+<header class="special">
+	<h3><a href="main_hall">Back to Main Hall</a></h3>
+</header>
+  <div id="mapdiv">
+  <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+  <script>
+   map = new OpenLayers.Map("mapdiv");
+    map.addLayer(new OpenLayers.Layer.OSM());
+
+    var lonLat = new OpenLayers.LonLat( {% for mydata in myHall %}
+								{{ mydata.gpsx }} , {{ mydata.gpsy }}
+						{%  endfor %}  )
+          .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+          );
+
+    var zoom=16;
+
+    var markers = new OpenLayers.Layer.Markers( "Markers" );
+    map.addLayer(markers);
+
+    markers.addMarker(new OpenLayers.Marker(lonLat));
+
+    map.setCenter (lonLat, zoom);
+  </script>
+  </div>
+</body>
+</html>
